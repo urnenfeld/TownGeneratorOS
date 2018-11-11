@@ -3,10 +3,12 @@ package com.watabou.towngenerator;
 import openfl.display.Sprite;
 
 import com.watabou.coogee.Scene;
+import com.watabou.coogee.Game;
+import com.watabou.utils.Random;
 
 import com.watabou.towngenerator.building.Model;
 import com.watabou.towngenerator.mapping.CityMap;
-import com.watabou.towngenerator.ui.CitySizeButton;
+import com.watabou.towngenerator.ui.Button;
 import com.watabou.towngenerator.ui.Tooltip;
 
 class TownScene extends Scene {
@@ -25,10 +27,14 @@ class TownScene extends Scene {
 		buttons = new Sprite();
 		addChild( buttons );
 
-		var smallTown = new CitySizeButton( "Small Town", 6, 10 );
-		var largeTown = new CitySizeButton( "Large Town", 10, 15 );
-		var smallCity = new CitySizeButton( "Small City", 15, 24 );
-		var largeCity = new CitySizeButton( "Large City", 24, 40 );
+		var smallTown = new Button("Small Town");
+    smallTown.click.add(function() { set_size(6, 10); });
+		var largeTown = new Button("Large Town");
+    largeTown.click.add(function() { set_size(10, 15); });
+		var smallCity = new Button("Small City");
+    smallCity.click.add(function() { set_size(15, 24); });
+		var largeCity = new Button("Large City");
+    largeCity.click.add(function() { set_size(24, 40); });
 
 		var pos = 0.0;
 		for (btn in [smallTown, largeTown, smallCity, largeCity]) {
@@ -43,6 +49,16 @@ class TownScene extends Scene {
 		return map.scaleX;
 	private function set_scale( value:Float ):Float
 		return (map.scaleX = map.scaleY = value);
+
+  private function set_size(minSize: Int, maxSize: Int): Void {
+    var size = minSize + Std.int( Math.random() * (maxSize - minSize) );
+  	StateManager.size = size;
+  	StateManager.seed = Random.getSeed();
+  	StateManager.pushParams();
+
+  	new Model( size );
+  	Game.switchScene( TownScene );
+  }
 
 	override public function layout():Void {
 		map.x = rWidth / 2;

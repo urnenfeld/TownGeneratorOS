@@ -10,7 +10,7 @@ import msignal.Signal.Signal0;
 
 import com.watabou.coogee.BitmapText;
 
-import com.watabou.towngenerator.mapping.CityMap;
+import com.watabou.towngenerator.drawing.CityMap;
 
 class Button extends Sprite {
 

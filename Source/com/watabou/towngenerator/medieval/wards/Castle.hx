@@ -1,9 +1,9 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
 import openfl.geom.Point;
-import com.watabou.towngenerator.building.Patch;
-import com.watabou.towngenerator.building.Model;
-import com.watabou.towngenerator.building.CurtainWall;
+import com.watabou.towngenerator.medieval.Patch;
+import com.watabou.towngenerator.medieval.Model;
+import com.watabou.towngenerator.medieval.CurtainWall;
 
 using com.watabou.utils.ArrayExtender;
 

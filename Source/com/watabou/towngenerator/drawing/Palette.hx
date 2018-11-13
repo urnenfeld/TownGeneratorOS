@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.mapping;
+package com.watabou.towngenerator.drawing;
 
 class Palette {
 

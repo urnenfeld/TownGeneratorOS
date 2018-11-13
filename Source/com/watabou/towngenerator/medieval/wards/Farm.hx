@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
 import com.watabou.utils.Random;
 import com.watabou.geom.Polygon;

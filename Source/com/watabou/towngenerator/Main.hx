@@ -5,8 +5,8 @@ import openfl.system.Capabilities;
 import com.watabou.coogee.Game;
 import com.watabou.coogee.BitmapText.BitmapFont;
 
-import com.watabou.towngenerator.building.Model;
-import com.watabou.towngenerator.mapping.CityMap;
+import com.watabou.towngenerator.medieval.Model;
+import com.watabou.towngenerator.drawing.CityMap;
 
 class Main extends Game {
 

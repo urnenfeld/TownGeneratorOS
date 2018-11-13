@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.mapping;
+package com.watabou.towngenerator.drawing;
 
 import openfl.display.Shape;
 import openfl.display.CapsStyle;
@@ -8,9 +8,9 @@ import openfl.geom.Point;
 
 import com.watabou.geom.Polygon;
 
-import com.watabou.towngenerator.wards.*;
-import com.watabou.towngenerator.building.CurtainWall;
-import com.watabou.towngenerator.building.Model;
+import com.watabou.towngenerator.medieval.wards.*;
+import com.watabou.towngenerator.medieval.CurtainWall;
+import com.watabou.towngenerator.medieval.Model;
 
 using com.watabou.utils.ArrayExtender;
 using com.watabou.utils.GraphicsExtender;

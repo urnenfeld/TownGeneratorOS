@@ -1,10 +1,10 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
 import com.watabou.utils.Random;
 
-import com.watabou.towngenerator.building.Cutter;
-import com.watabou.towngenerator.building.Patch;
-import com.watabou.towngenerator.building.Model;
+import com.watabou.towngenerator.medieval.Cutter;
+import com.watabou.towngenerator.medieval.Patch;
+import com.watabou.towngenerator.medieval.Model;
 
 class Cathedral extends Ward {
 

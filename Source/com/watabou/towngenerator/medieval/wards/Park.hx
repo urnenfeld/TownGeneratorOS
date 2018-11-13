@@ -1,6 +1,6 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
-import com.watabou.towngenerator.building.Cutter;
+import com.watabou.towngenerator.medieval.Cutter;
 
 class Park extends Ward {
 

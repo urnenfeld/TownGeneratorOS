@@ -1,10 +1,10 @@
-package com.watabou.towngenerator.mapping;
+package com.watabou.towngenerator.drawing;
 
 import openfl.display.Shape;
 import openfl.display.Sprite;
 import openfl.events.MouseEvent;
 
-import com.watabou.towngenerator.building.Patch;
+import com.watabou.towngenerator.medieval.Patch;
 import com.watabou.towngenerator.ui.Tooltip;
 
 using com.watabou.utils.GraphicsExtender;

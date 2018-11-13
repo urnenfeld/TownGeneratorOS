@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
 import openfl.geom.Point;
 
@@ -6,9 +6,9 @@ import com.watabou.geom.GeomUtils;
 import com.watabou.geom.Polygon;
 import com.watabou.utils.Random;
 
-import com.watabou.towngenerator.building.Cutter;
-import com.watabou.towngenerator.building.Patch;
-import com.watabou.towngenerator.building.Model;
+import com.watabou.towngenerator.medieval.Cutter;
+import com.watabou.towngenerator.medieval.Patch;
+import com.watabou.towngenerator.medieval.Model;
 
 using com.watabou.utils.ArrayExtender;
 using com.watabou.utils.PointExtender;

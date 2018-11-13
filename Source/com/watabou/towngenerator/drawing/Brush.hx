@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.mapping;
+package com.watabou.towngenerator.drawing;
 
 import openfl.display.JointStyle;
 import openfl.display.Graphics;

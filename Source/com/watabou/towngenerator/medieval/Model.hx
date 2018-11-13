@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.building;
+package com.watabou.towngenerator.medieval;
 
 import Type;
 import openfl.errors.Error;
@@ -10,7 +10,7 @@ import com.watabou.geom.Voronoi;
 import com.watabou.utils.MathUtils;
 import com.watabou.utils.Random;
 
-import com.watabou.towngenerator.wards.*;
+import com.watabou.towngenerator.medieval.wards.*;
 
 using com.watabou.utils.PointExtender;
 using com.watabou.utils.ArrayExtender;

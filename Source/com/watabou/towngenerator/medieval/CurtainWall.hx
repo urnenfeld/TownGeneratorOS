@@ -1,4 +1,4 @@
-package com.watabou.towngenerator.building;
+package com.watabou.towngenerator.medieval;
 
 import openfl.errors.Error;
 import openfl.geom.Point;

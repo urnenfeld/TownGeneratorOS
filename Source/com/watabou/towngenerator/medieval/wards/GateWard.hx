@@ -1,7 +1,7 @@
-package com.watabou.towngenerator.wards;
+package com.watabou.towngenerator.medieval.wards;
 
-import com.watabou.towngenerator.building.Patch;
-import com.watabou.towngenerator.building.Model;
+import com.watabou.towngenerator.medieval.Patch;
+import com.watabou.towngenerator.medieval.Model;
 
 import com.watabou.utils.Random;
 

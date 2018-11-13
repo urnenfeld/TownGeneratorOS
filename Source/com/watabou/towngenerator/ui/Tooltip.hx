@@ -7,7 +7,7 @@ import openfl.geom.Point;
 
 import com.watabou.coogee.BitmapText;
 
-import com.watabou.towngenerator.mapping.CityMap;
+import com.watabou.towngenerator.drawing.CityMap;
 
 using com.watabou.utils.DisplayObjectExtender;
 

@@ -1,11 +1,11 @@
-package com.watabou.towngenerator.building;
+package com.watabou.towngenerator.medieval;
 
 import openfl.geom.Point;
 
 import com.watabou.geom.Polygon;
 import com.watabou.geom.Voronoi.Region;
 
-import com.watabou.towngenerator.wards.Ward;
+import com.watabou.towngenerator.medieval.wards.Ward;
 
 class Patch {
 

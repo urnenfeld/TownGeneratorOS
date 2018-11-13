@@ -6,8 +6,8 @@ import com.watabou.coogee.Scene;
 import com.watabou.coogee.Game;
 import com.watabou.utils.Random;
 
-import com.watabou.towngenerator.building.Model;
-import com.watabou.towngenerator.mapping.CityMap;
+import com.watabou.towngenerator.medieval.Model;
+import com.watabou.towngenerator.drawing.CityMap;
 import com.watabou.towngenerator.ui.Button;
 import com.watabou.towngenerator.ui.Tooltip;
 

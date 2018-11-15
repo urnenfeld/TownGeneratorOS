@@ -55,7 +55,22 @@ class Model {
 	public var border	: CurtainWall;
 	public var wall		: CurtainWall;
 
-	public var cityRadius	: Float;
+  private var _cityRadius: Float = -1;
+	public var cityRadius(get,never): Float;
+  public function get_cityRadius(): Float {
+    if (_cityRadius == -1) {
+      _cityRadius = Lambda.fold(patches, function(patch: Patch, radius: Float) {
+        if (patch.withinCity) {
+          var max = patch.shape.max(function(p) { return p.length; }).length;
+          return Math.max(radius, max);
+        } else {
+          return radius;
+        }
+      }, 0);
+    }
+
+    return _cityRadius;
+  }
 
 	// List of all entrances of a city including castle gates
 	public var gates	: Array<Point>;
@@ -121,7 +136,7 @@ class Model {
 
 		var count = 0;
 		for (r in regions) {
-			var patch = Patch.fromRegion( r );
+      var patch = new Patch( [for (tr in r.vertices) tr.c] );
 			patches.push( patch );
 
 			if (count == 0) {
@@ -399,13 +414,8 @@ class Model {
 			}
 
 		// Calculating radius and processing countryside
-		cityRadius = 0;
 		for (patch in patches)
-			if (patch.withinCity)
-				// Radius of the city is the farthest point of all wards from the center
-				for (v in patch.shape)
-					cityRadius = Math.max( cityRadius, v.length );
-			else if (patch.ward == null)
+      if (!patch.withinCity && patch.ward == null)
 				patch.ward = Random.bool( 0.2 ) && patch.shape.compactness >= 0.7 ?
 					new Farm( this, patch ) :
 					new Ward( this, patch );

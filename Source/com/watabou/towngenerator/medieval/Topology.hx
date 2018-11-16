@@ -37,7 +37,9 @@ class Topology {
 			blocked = blocked.concat( model.wall.shape );
 		blocked = blocked.difference( model.gates );
 
-		var border = model.border.shape;
+		var border = null;
+    if (model.border != null)
+      border = model.border.shape;
 
 		for (p in model.patches) {
 			var withinCity = p.withinCity;
@@ -49,12 +51,12 @@ class Topology {
 				var v0 = v1; v1 = p.shape[i];
 				var n0 = n1; n1 = processPoint( v1 );
 
-				if (n0 != null && !border.contains( v0 ))
+				if (n0 != null && (border == null || !border.contains( v0 )))
 					if (withinCity)
 						inner.add( n0 )
 					else
 						outer.add( n0 );
-				if (n1 != null && !border.contains( v1 ))
+				if (n1 != null && (border == null || !border.contains( v1 )))
 					if (withinCity )
 						inner.add( n1 )
 					else

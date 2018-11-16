@@ -28,7 +28,7 @@ class PatchView extends Shape {
 	}
 
 	private function onRollOver( e:MouseEvent )
-		if (patch != lastPatch) {
+		if (patch != lastPatch && patch.ward != null) {
 			lastPatch = patch;
 			Tooltip.instance.set( patch.ward.getLabel() );
 		}

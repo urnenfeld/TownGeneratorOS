@@ -41,13 +41,11 @@ class Model {
 		CraftsmenWard, CraftsmenWard, CraftsmenWard, MilitaryWard, Slum,
 		CraftsmenWard, Park, PatriciateWard, Market, MerchantWard];
 
-	public var topology	: Topology;
+	public var patches	: Array<Patch> = [];
 
-	public var patches	: Array<Patch>;
-	public var waterbody: Array<Patch>;
 	// For a walled city it's a list of patches within the walls,
 	// for a city without walls it's just a list of all city wards
-	public var inner	: Array<Patch>;
+	public var inner	: Array<Patch> = [];
 	public var citadel	: Patch;
 	public var plaza	: Patch;
 	public var center	: Point;
@@ -73,13 +71,13 @@ class Model {
   }
 
 	// List of all entrances of a city including castle gates
-	public var gates	: Array<Point>;
+	public var gates	: Array<Point> = [];
 
 	// Joined list of streets (inside walls) and roads (outside walls)
 	// without diplicating segments
-	public var arteries	: Array<Street>;
-	public var streets	: Array<Street>;
-	public var roads	: Array<Street>;
+	public var arteries	: Array<Street> = [];
+	public var streets	: Array<Street> = [];
+	public var roads	: Array<Street> = [];
 
 	public function new( nPatches=-1, seed=-1 ) {
 
@@ -130,9 +128,6 @@ class Model {
 		voronoi.points.sort( function( p1:Point, p2:Point )
 			return MathUtils.sign( p1.length - p2.length ) );
 		var regions = voronoi.partioning();
-
-		patches = [];
-		inner = [];
 
 		var count = 0;
 		for (r in regions) {
@@ -231,7 +226,7 @@ class Model {
 				street[i].set( smoothed[i] );
 		}
 
-		topology = new Topology( this );
+		var topology = new Topology( this );
 
 		for (gate in gates) {
 			// Each gate is connected to the nearest corner of the plaza or to the central junction
@@ -299,7 +294,6 @@ class Model {
 		for (road in roads)
 			cut2segments( road );
 
-		arteries = [];
 		while (segments.length > 0) {
 			var seg = segments.pop();
 
@@ -366,12 +360,13 @@ class Model {
 		}
 
 		// Assigning inner city gate wards
-		for (gate in border.gates)
-			for (patch in patchByVertex( gate ))
-				if (patch.withinCity && patch.ward == null && Random.bool( wall == null ? 0.2 : 0.5 )) {
-					patch.ward = new GateWard( this, patch );
-					unassigned.remove( patch );
-				}
+    if (border != null)
+  		for (gate in border.gates)
+  			for (patch in patchByVertex( gate ))
+  				if (patch.withinCity && patch.ward == null && Random.bool( wall == null ? 0.2 : 0.5 )) {
+  					patch.ward = new GateWard( this, patch );
+  					unassigned.remove( patch );
+  				}
 
 		var wards = WARDS.copy();
 		// some shuffling
@@ -423,7 +418,8 @@ class Model {
 
 	private function buildGeometry()
 		for (patch in patches)
-			patch.ward.createGeometry();
+      if (patch.ward != null)
+			  patch.ward.createGeometry();
 
 
 	public function getNeighbour( patch:Patch, v:Point ):Patch {

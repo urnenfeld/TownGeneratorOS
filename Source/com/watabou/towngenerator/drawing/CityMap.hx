@@ -74,7 +74,7 @@ class CityMap extends Sprite {
 		if (model.wall != null)
 			drawWall( walls.graphics, model.wall, false );
 
-		if (model.citadel != null)
+		if (model.citadel != null && model.citadel.ward != null)
 			drawWall( walls.graphics, cast( model.citadel.ward, Castle).wall, true );
 	}
 

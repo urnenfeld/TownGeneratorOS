@@ -11,6 +11,7 @@ import com.watabou.geom.Polygon;
 import com.watabou.towngenerator.medieval.wards.*;
 import com.watabou.towngenerator.medieval.CurtainWall;
 import com.watabou.towngenerator.medieval.Model;
+import com.watabou.towngenerator.medieval.Street;
 
 using com.watabou.utils.ArrayExtender;
 using com.watabou.utils.GraphicsExtender;
@@ -20,16 +21,21 @@ class CityMap extends Sprite {
 
 	public static var palette = Palette.DEFAULT;
 
+  private var model: Model;
 	private var patches	: Array<PatchView>;
 
 	private var brush	: Brush;
 
+  public var cityRadius(get,null): Float;
+  public function get_cityRadius(): Float {
+    return this.model.cityRadius;
+  }
+
 	public function new( model:Model ) {
 		super();
 
+    this.model = model;
 		brush = new Brush( palette );
-
-		var model = Model.instance;
 
 		for (road in model.roads) {
 			var roadView = new Shape();

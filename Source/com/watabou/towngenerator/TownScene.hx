@@ -1,11 +1,13 @@
 package com.watabou.towngenerator;
 
 import openfl.display.Sprite;
+import openfl.errors.Error;
 
 import com.watabou.coogee.Scene;
 import com.watabou.coogee.Game;
 import com.watabou.utils.Random;
 
+import com.watabou.towngenerator.medieval.Generator;
 import com.watabou.towngenerator.medieval.Model;
 import com.watabou.towngenerator.drawing.CityMap;
 import com.watabou.towngenerator.ui.Button;
@@ -19,7 +21,17 @@ class TownScene extends Scene {
 	public function new() {
 		super();
 
-		map = new CityMap( Model.instance );
+    var generator: Generator = null;
+
+		do try {
+			generator = new Generator(StateManager.size, StateManager.seed);
+		} catch (e:Error) {
+      StateManager.seed = -1;
+      StateManager.pushParams();
+			trace( e.message );
+		} while (generator == null);
+
+		map = new CityMap(generator.model);
 		addChild( map );
 
 		addChild( new Tooltip() );
@@ -56,7 +68,6 @@ class TownScene extends Scene {
   	StateManager.seed = Random.getSeed();
   	StateManager.pushParams();
 
-  	new Model( size );
   	Game.switchScene( TownScene );
   }
 
@@ -64,8 +75,8 @@ class TownScene extends Scene {
 		map.x = rWidth / 2;
 		map.y = rHeight / 2;
 
-		var scaleX = rWidth / Model.instance.cityRadius;
-		var scaleY = rHeight / Model.instance.cityRadius;
+		var scaleX = rWidth / map.cityRadius;
+		var scaleY = rHeight / map.cityRadius;
 		var scMin = Math.min( scaleX, scaleY );
 		var scMax = Math.max( scaleX, scaleY );
 		scale = (scMax / scMin > 2 ? scMax / 2 : scMin) * 0.5;

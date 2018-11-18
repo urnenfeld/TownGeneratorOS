@@ -11,11 +11,14 @@ import com.watabou.utils.MathUtils;
 import com.watabou.utils.Random;
 
 import com.watabou.towngenerator.medieval.wards.*;
+import com.watabou.towngenerator.model.Edge;
 
 using com.watabou.utils.PointExtender;
 using com.watabou.utils.ArrayExtender;
 
 class Model {
+  private var edges         : Map<Point, Array<Edge>> = new Map<Point, Array<Edge>>();
+
 	public var patches	: Array<Patch> = [];
 
 	// For a walled city it's a list of patches within the walls,
@@ -55,6 +58,31 @@ class Model {
 	public var roads	: Array<Street> = [];
 
   public function new() {}
+
+  public function findEdge(start: Point, end: Point): Edge {
+    var edges = this.edges[start];
+    if (edges == null) return null;
+
+    for (edge in edges) {
+      if (edge.end == end) return edge;
+    }
+
+    return null;
+  }
+
+  public function addEdge(start: Point, end: Point): Edge {
+    var nStart = start.x <= end.x ? start : end;
+    var nEnd = nStart == start ? end : start;
+    var edge = new Edge(nStart, nEnd);
+
+    if (this.edges[start] == null) this.edges[start] = [];
+    if (this.edges[end] == null) this.edges[end] = [];
+
+    this.edges[start].push(edge);
+    this.edges[end].push(edge);
+
+    return edge;
+  }
 
 	public static function findCircumference( wards:Array<Patch> ):Polygon {
 		if (wards.length == 0)

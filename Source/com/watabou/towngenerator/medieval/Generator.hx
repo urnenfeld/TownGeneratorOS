@@ -83,7 +83,16 @@ class Generator {
 
 		var count = 0;
 		for (r in regions) {
-      var patch = new Patch( [for (tr in r.vertices) tr.c] );
+      var shape = new Polygon([for (tr in r.vertices) tr.c]);
+      var edges = [];
+
+      shape.forEdge(function (p1, p2) {
+        var edge = this.model.findEdge(p1, p2);
+        if (edge == null) edge = this.model.addEdge(p1, p2);
+        edges.push(edge);
+      });
+
+      var patch = new Patch(shape, edges);
 			this.model.patches.push( patch );
 
 			if (count == 0) {

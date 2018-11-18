@@ -6,9 +6,12 @@ import com.watabou.geom.Segment;
 class Edge extends Segment {
   public var features: Array<EdgeFeature> = [];
   public var mainFeature: EdgeFeature;
-
-  public function new(start: Point, end: Point, feature: EdgeFeature) {
-    super(start, end);
-    this.mainFeature = feature;
+  public var width(get,null): Float;
+  public function get_width(): Float {
+    var width: Float = 0;
+    for (feature in features) {
+      width += feature.width;
+    }
+    return width;
   }
 }

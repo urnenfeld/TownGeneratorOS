@@ -22,16 +22,14 @@ class Ward {
 	public var model : Model;
 	public var patch : Patch;
 
-	public var geometry	: Array<Polygon>;
+	public var geometry	: Array<Polygon> = [];
 
 	public function new( model:Model, patch:Patch ) {
 		this.model = model;
 		this.patch = patch;
 	}
 
-	public function createGeometry() {
-		geometry = [];
-	}
+	public function createGeometry() {}
 
 	public function getCityBlock():Polygon {
 		var insetDist:Array<Float> = [];

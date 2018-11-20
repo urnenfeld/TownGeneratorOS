@@ -84,6 +84,12 @@ class Model {
     return edge;
   }
 
+  public function findOrAddEdge(start: Point, end: Point): Edge {
+    var edge = this.findEdge(start, end);
+    if (edge == null) edge = this.addEdge(start, end);
+    return edge;
+  }
+
 	public static function findCircumference( wards:Array<Patch> ):Polygon {
 		if (wards.length == 0)
 			return new Polygon()

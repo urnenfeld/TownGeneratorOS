@@ -26,41 +26,13 @@ class Topology {
 		pt2node = new Map();
 		node2pt = new Map();
 
-		inner = [];
-		outer = [];
-
-		// Building a list of all blocked points (shore + walls excluding gates)
-		blocked = [];
-		if (model.citadel != null)
-			blocked = blocked.concat( model.citadel.shape );
-		if (model.wall != null)
-			blocked = blocked.concat( model.wall.shape );
-		blocked = blocked.difference( model.gates );
-
-		var border = null;
-    if (model.border != null)
-      border = model.border.shape;
-
 		for (p in model.patches) {
-			var withinCity = p.withinCity;
-
 			var v1 = p.shape.last();
 			var n1 = processPoint( v1 );
 
 			for (i in 0...p.shape.length) {
 				var v0 = v1; v1 = p.shape[i];
 				var n0 = n1; n1 = processPoint( v1 );
-
-				if (n0 != null && (border == null || !border.contains( v0 )))
-					if (withinCity)
-						inner.add( n0 )
-					else
-						outer.add( n0 );
-				if (n1 != null && (border == null || !border.contains( v1 )))
-					if (withinCity )
-						inner.add( n1 )
-					else
-						outer.add( n1 );
 
 				if (n0 != null && n1 != null)
 					n0.link( n1, Point.distance( v0, v1 ) );
@@ -78,11 +50,12 @@ class Topology {
 			node2pt[n] = v;
 		}
 
-		return blocked.contains( v ) ? null : n;
+    return n;
 	}
 
-	public function buildPath( from:Point, to:Point, exclude:Array<Node>=null ):Array<Point> {
-		var path = graph.aStar( pt2node[from], pt2node[to], exclude );
+	public function buildPath( from:Point, to:Point, exclude:Array<Point>=null ):Array<Point> {
+    var excludeNodes = exclude == null ? null : [for (p in exclude) pt2node[p]];
+		var path = graph.aStar(pt2node[from], pt2node[to], excludeNodes);
 		return path == null ? null : [for (n in path) node2pt[n]];
 	}
 }

@@ -35,6 +35,16 @@ class ArrayExtender {
 	public static inline function last<T>( a:Array<T> )
 		return a[a.length - 1];
 
+  public static function eachCons<T>(a: Array<T>, count: Int): Array<Array<T>> {
+    if (count > a.length) return [];
+
+    var ret = [];
+    for (i in 0...(a.length - count + 1)) {
+      ret.push(a.slice(i, i + count));
+    }
+    return ret;
+  }
+
 	public static function min<T>( a:Array<T>, f:T->Float ):T {
 		var result = a[0];
 		var min = f( result );

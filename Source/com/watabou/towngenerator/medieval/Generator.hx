@@ -12,6 +12,8 @@ import com.watabou.utils.Random;
 
 import com.watabou.towngenerator.medieval.wards.*;
 import com.watabou.towngenerator.model.Edge;
+import com.watabou.towngenerator.model.edgefeatures.*;
+import com.watabou.towngenerator.model.edgefeatures.RoadFeature.RoadType;
 
 using com.watabou.utils.PointExtender;
 using com.watabou.utils.ArrayExtender;
@@ -55,8 +57,8 @@ class Generator {
 	public function generate():Void {
 		buildPatches();
 		optimizeJunctions();
+    buildRoads();
     buildWalls();
-    buildStreets();
     createWards();
     buildGeometry();
 	}
@@ -87,9 +89,7 @@ class Generator {
       var edges = [];
 
       shape.forEdge(function (p1, p2) {
-        var edge = this.model.findEdge(p1, p2);
-        if (edge == null) edge = this.model.addEdge(p1, p2);
-        edges.push(edge);
+        edges.push(this.model.findOrAddEdge(p1, p2));
       });
 
       var patch = new Patch(shape, edges);
@@ -126,8 +126,6 @@ class Generator {
 		var radius = this.model.border.getRadius();
 		this.model.patches = this.model.patches.filter( function( p:Patch ) return p.shape.distance( this.model.center ) < radius * 3 );
 
-		this.model.gates = this.model.border.gates;
-
 		if (this.model.citadel != null) {
 			var castle = new Castle( this.model, this.model.citadel );
 			castle.wall.buildTowers();
@@ -135,12 +133,10 @@ class Generator {
 
 			if (this.model.citadel.shape.compactness < 0.75)
 				throw new Error( "Bad citadel shape!" );
-
-			this.model.gates = this.model.gates.concat( castle.wall.gates );
 		}
 	}
 
-	private function buildStreets():Void {
+	private function buildRoads():Void {
 
 		function smoothStreet( street:Street ):Void {
 			var smoothed = street.smoothVertexEq( 3 );
@@ -148,42 +144,59 @@ class Generator {
 				street[i].set( smoothed[i] );
 		}
 
+    function addRoad(points: Array<Point>, type: RoadType) {
+      for (segment in points.eachCons(2)) {
+        var edge = this.model.findOrAddEdge(segment[0], segment[1]);
+        if (edge.features.length > 0) return;
+
+        edge.features.push(new RoadFeature(type));
+      }
+    }
+
 		var topology = new Topology(this.model);
 
-		for (gate in this.model.gates) {
-			// Each gate is connected to the nearest corner of the plaza or to the central junction
-			var end:Point = this.model.plaza != null ?
-				this.model.plaza.shape.min( function( v ) return Point.distance( v, gate ) ) :
-				this.model.center;
+    var outerPerimeter = Model.findCircumference(this.model.patches);
+    var innerPerimeter = Model.findCircumference(this.model.inner);
+    var numberOfRoads = 2 + Math.round(Math.random());
 
-			var street = topology.buildPath( gate, end, topology.outer );
-			if (street != null) {
-				this.model.streets.push( street );
+    var entrances = innerPerimeter.filter(function(point) {
+      if (this.model.citadel != null && this.model.citadel.shape.contains(point)) return false;
 
-				if (this.model.border.gates.contains( gate )) {
-					var dir = gate.norm( 1000 );
-					var start = null;
-					var dist = Math.POSITIVE_INFINITY;
-					for (p in topology.node2pt) {
-						var d = Point.distance( p, dir );
-						if (d < dist) {
-							dist = d;
-							start = p;
-						}
-					}
+      var patchCount = this.model.patches.count(function(patch: Patch) { return patch.shape.contains(point); });
+      var innerPatchCount = this.model.inner.count(function(patch: Patch) { return patch.shape.contains(point); });
 
-					var road = topology.buildPath( start, gate, topology.inner );
-					if (road != null)
-						this.model.roads.push( road );
-				}
-			} else
-				throw new Error( "Unable to build a street!" );
-		}
+      return innerPatchCount > 1 && (patchCount - innerPatchCount) > 1;
+    }).shuffle().slice(0, numberOfRoads);
 
-		tidyUpRoads();
+    if (entrances.length == 0) throw new Error("No valid city entrances");
 
-		for (a in this.model.arteries)
-			smoothStreet( a );
+    this.model.gates = entrances;
+
+    var excludePoints = innerPerimeter.difference(entrances);
+    if (this.model.citadel != null) excludePoints = excludePoints.concat(this.model.citadel.shape);
+
+    for (entrance in entrances) {
+      var start = outerPerimeter.min(function(p) { return Point.distance(p, entrance); });
+
+      var end = this.model.plaza != null ?
+        this.model.plaza.shape.min(function(p) { return Point.distance(p, entrance); }) :
+        this.model.center;
+
+      var road = topology.buildPath(start, entrance, excludePoints);
+      if (road == null) throw new Error("Unable to build road");
+      addRoad(road, Road);
+      this.model.roads.push(road);
+
+      var street = topology.buildPath(entrance, end, excludePoints);
+      if (street == null) throw new Error("Unable to build street");
+      addRoad(street, Street);
+      this.model.streets.push(street);
+    }
+
+    tidyUpRoads();
+
+    for (a in this.model.arteries)
+      smoothStreet( a );
 	}
 
 	private function tidyUpRoads() {

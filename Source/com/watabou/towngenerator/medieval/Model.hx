@@ -17,22 +17,22 @@ using com.watabou.utils.PointExtender;
 using com.watabou.utils.ArrayExtender;
 
 class Model {
-  private var edges         : Map<Point, Array<Edge>> = new Map<Point, Array<Edge>>();
+  public var edges         : Map<Point, Map<Point,Edge>> = new Map<Point, Map<Point,Edge>>();
 
-	public var patches	: Array<Patch> = [];
+  public var patches  : Array<Patch> = [];
 
-	// For a walled city it's a list of patches within the walls,
-	// for a city without walls it's just a list of all city wards
-	public var inner	: Array<Patch> = [];
-	public var citadel	: Patch;
-	public var plaza	: Patch;
-	public var center	: Point;
+  // For a walled city it's a list of patches within the walls,
+  // for a city without walls it's just a list of all city wards
+  public var inner  : Array<Patch> = [];
+  public var citadel  : Patch;
+  public var plaza  : Patch;
+  public var center  : Point;
 
-	public var border	: CurtainWall;
-	public var wall		: CurtainWall;
+  public var border  : CurtainWall;
+  public var wall    : CurtainWall;
 
   private var _cityRadius: Float = -1;
-	public var cityRadius(get,never): Float;
+  public var cityRadius(get,never): Float;
   public function get_cityRadius(): Float {
     if (_cityRadius == -1) {
       _cityRadius = Lambda.fold(patches, function(patch: Patch, radius: Float) {
@@ -48,38 +48,46 @@ class Model {
     return _cityRadius;
   }
 
-	// List of all entrances of a city including castle gates
-	public var gates	: Array<Point> = [];
+  // List of all entrances of a city including castle gates
+  public var gates  : Array<Point> = [];
 
-	// Joined list of streets (inside walls) and roads (outside walls)
-	// without diplicating segments
-	public var arteries	: Array<Street> = [];
-	public var streets	: Array<Street> = [];
-	public var roads	: Array<Street> = [];
+  // Joined list of streets (inside walls) and roads (outside walls)
+  // without diplicating segments
+  public var arteries  : Array<Street> = [];
+  public var streets  : Array<Street> = [];
+  public var roads  : Array<Street> = [];
 
   public function new() {}
 
   public function findEdge(start: Point, end: Point): Edge {
-    var edges = this.edges[start];
-    if (edges == null) return null;
+    var nStart = start;
+    var nEnd = end;
 
-    for (edge in edges) {
-      if (edge.end == end) return edge;
+    if (end.x > start.x || (end.x == start.x && end.y > start.y)) {
+      nStart = end;
+      nEnd = start;
     }
 
-    return null;
+    var edges = this.edges[nStart];
+    if (edges == null) return null;
+
+    return edges[nEnd];
   }
 
   public function addEdge(start: Point, end: Point): Edge {
-    var nStart = start.x <= end.x ? start : end;
-    var nEnd = nStart == start ? end : start;
+    var nStart = start;
+    var nEnd = end;
+
+    if (end.x > start.x || (end.x == start.x && end.y > start.y)) {
+      nStart = end;
+      nEnd = start;
+    }
+
     var edge = new Edge(nStart, nEnd);
 
-    if (this.edges[start] == null) this.edges[start] = [];
-    if (this.edges[end] == null) this.edges[end] = [];
+    if (this.edges[nStart] == null) this.edges[nStart] = new Map<Point,Edge>();
 
-    this.edges[start].push(edge);
-    this.edges[end].push(edge);
+    this.edges[nStart][nEnd] = edge;
 
     return edge;
   }
@@ -90,59 +98,59 @@ class Model {
     return edge;
   }
 
-	public static function findCircumference( wards:Array<Patch> ):Polygon {
-		if (wards.length == 0)
-			return new Polygon()
-		else if (wards.length == 1)
-			return new Polygon( wards[0].shape );
+  public static function findCircumference( wards:Array<Patch> ):Polygon {
+    if (wards.length == 0)
+      return new Polygon()
+    else if (wards.length == 1)
+      return new Polygon( wards[0].shape );
 
-		var A:Array<Point> = [];
-		var B:Array<Point> = [];
+    var A:Array<Point> = [];
+    var B:Array<Point> = [];
 
-		for (w1 in wards)
-			w1.shape.forEdge( function(a, b ) {
-				var outerEdge = true;
-				for (w2 in wards)
-					if (w2.shape.findEdge( b, a ) != -1) {
-						outerEdge = false;
-						break;
-					}
-				if (outerEdge) {
-					A.push( a );
-					B.push( b );
-				}
-			} );
+    for (w1 in wards)
+      w1.shape.forEdge( function(a, b ) {
+        var outerEdge = true;
+        for (w2 in wards)
+          if (w2.shape.findEdge( b, a ) != -1) {
+            outerEdge = false;
+            break;
+          }
+        if (outerEdge) {
+          A.push( a );
+          B.push( b );
+        }
+      } );
 
-		var result = new Polygon();
-		var index = 0;
-		do {
-			result.push( A[index] );
-			index = A.indexOf( B[index] );
-		} while (index != 0);
+    var result = new Polygon();
+    var index = 0;
+    do {
+      result.push( A[index] );
+      index = A.indexOf( B[index] );
+    } while (index != 0);
 
-		return result;
-	}
+    return result;
+  }
 
-	public function patchByVertex( v:Point ):Array<Patch> {
-		return patches.filter(
-			function( patch:Patch ) return patch.shape.contains( v )
-		);
-	}
+  public function patchByVertex( v:Point ):Array<Patch> {
+    return patches.filter(
+      function( patch:Patch ) return patch.shape.contains( v )
+    );
+  }
 
-	public function getNeighbour( patch:Patch, v:Point ):Patch {
-		var next = patch.shape.next( v );
-		for (p in patches)
-			if (p.shape.findEdge( next, v ) != -1)
-				return p;
-		return null;
-	}
+  public function getNeighbour( patch:Patch, v:Point ):Patch {
+    var next = patch.shape.next( v );
+    for (p in patches)
+      if (p.shape.findEdge( next, v ) != -1)
+        return p;
+    return null;
+  }
 
-	public function getNeighbours( patch:Patch ):Array<Patch>
-		return patches.filter( function( p:Patch ) return p != patch && p.shape.borders( patch.shape ) );
+  public function getNeighbours( patch:Patch ):Array<Patch>
+    return patches.filter( function( p:Patch ) return p != patch && p.shape.borders( patch.shape ) );
 
-	// A ward is "enclosed" if it belongs to the city and
-	// it's surrounded by city wards and water
-	public function isEnclosed( patch:Patch ):Bool {
-		return patch.withinCity && (patch.withinWalls || getNeighbours( patch ).every( function( p:Patch ) return p.withinCity ));
-	}
+  // A ward is "enclosed" if it belongs to the city and
+  // it's surrounded by city wards and water
+  public function isEnclosed( patch:Patch ):Bool {
+    return patch.withinCity && (patch.withinWalls || getNeighbours( patch ).every( function( p:Patch ) return p.withinCity ));
+  }
 }

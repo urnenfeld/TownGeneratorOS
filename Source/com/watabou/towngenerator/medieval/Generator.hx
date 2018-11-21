@@ -149,7 +149,7 @@ class Generator {
 
     this.model.gates = entrances;
 
-    var excludePoints = innerPerimeter.difference(entrances);
+    var excludePoints = innerPerimeter.copy();
     if (this.model.citadel != null) excludePoints = excludePoints.concat(this.model.citadel.shape);
 
     for (entrance in entrances) {
@@ -159,12 +159,16 @@ class Generator {
         this.model.plaza.shape.min(function(p) { return Point.distance(p, entrance); }) :
         this.model.center;
 
-      var road = topology.buildPath(start, entrance, excludePoints);
+      // If we just allow all entrances before the loop, some paths can trace back through the city
+      // and out another entrance
+      var allowEntrance = excludePoints.without(entrance);
+
+      var road = topology.buildPath(start, entrance, allowEntrance);
       if (road == null) throw new Error("Unable to build road");
       addRoad(road, Road);
       this.model.roads.push(road);
 
-      var street = topology.buildPath(entrance, end, excludePoints);
+      var street = topology.buildPath(entrance, end, allowEntrance);
       if (street == null) throw new Error("Unable to build street");
       addRoad(street, Street);
       this.model.streets.push(street);

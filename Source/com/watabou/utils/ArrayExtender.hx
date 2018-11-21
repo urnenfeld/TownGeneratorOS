@@ -105,6 +105,10 @@ class ArrayExtender {
 			a.insert( index++, newEls[i] );
 	}
 
+  public static function without<T>( a:Array<T>, el:T):Array<T>
+    return a.filter( function( b ) { return b != el; } );
+
+
 	public static function add<T>( a:Array<T>, el:T )
 		if (a.indexOf( el ) == -1)
 			a.push( el );

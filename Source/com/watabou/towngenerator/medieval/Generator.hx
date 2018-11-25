@@ -127,7 +127,9 @@ class Generator {
     function addRoad(points: Array<Point>, type: RoadType) {
       for (segment in points.eachCons(2)) {
         var edge = this.model.findOrAddEdge(segment[0], segment[1]);
-        if (edge.features.length == 0) edge.features.push(new RoadFeature(type));
+        if (edge.features.length == 0) {
+          this.model.addEdgeFeature(segment[0], segment[1], new RoadFeature({start: 0, end: 0}, type));
+        }
       }
     }
 
@@ -170,14 +172,23 @@ class Generator {
 
       var street = topology.buildPath(entrance, end, allowEntrance);
       if (street == null) throw new Error("Unable to build street");
-      addRoad(street, Street);
+      addRoad(street, Avenue);
       this.model.streets.push(street);
+    }
+
+    for (patch in this.model.inner) {
+      for (edge in patch.edges) {
+        var isPerimeter = innerPerimeter.findEdge(edge.start, edge.end) != -1 || innerPerimeter.findEdge(edge.end, edge.start) != -1;
+        if (!isPerimeter && edge.features.length == 0) {
+          this.model.addEdgeFeature(edge.start, edge.end, new RoadFeature({start: 0, end: 0}, Street));
+        }
+      }
     }
 
     tidyUpRoads();
 
-    for (a in this.model.arteries)
-      smoothStreet( a );
+    // for (a in this.model.arteries)
+    //   smoothStreet( a );
   }
 
   private function tidyUpRoads() {
@@ -237,6 +248,12 @@ class Generator {
     if (wallsNeeded) {
       this.model.wall = this.model.border;
       this.model.wall.buildTowers();
+
+      this.model.border.shape.forEdge(function(p1, p2) {
+        var edge = this.model.findEdge(p1, p2);
+        this.model.addEdgeFeature(p1, p2, new WallFeature({start: 0, end: 0}));
+        this.model.addEdgeFeature(p1, p2, new RoadFeature({start: 1.5, end: 1.5}, Street));
+      });
     }
 
     var radius = this.model.border.getRadius();

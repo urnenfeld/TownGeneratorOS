@@ -12,12 +12,14 @@ import com.watabou.utils.Random;
 
 import com.watabou.towngenerator.medieval.wards.*;
 import com.watabou.towngenerator.model.Edge;
+import com.watabou.towngenerator.model.EdgeFeature;
 
 using com.watabou.utils.PointExtender;
 using com.watabou.utils.ArrayExtender;
 
 class Model {
-  public var edges         : Map<Point, Map<Point,Edge>> = new Map<Point, Map<Point,Edge>>();
+  public var edges: Array<Edge> = [];
+  public var edgeMap: Map<Point, Map<Point,Edge>> = new Map<Point, Map<Point,Edge>>();
 
   public var patches  : Array<Patch> = [];
 
@@ -60,34 +62,21 @@ class Model {
   public function new() {}
 
   public function findEdge(start: Point, end: Point): Edge {
-    var nStart = start;
-    var nEnd = end;
-
-    if (end.x > start.x || (end.x == start.x && end.y > start.y)) {
-      nStart = end;
-      nEnd = start;
-    }
-
-    var edges = this.edges[nStart];
+    var edges = this.edgeMap[start];
     if (edges == null) return null;
 
-    return edges[nEnd];
+    return edges[end];
   }
 
   public function addEdge(start: Point, end: Point): Edge {
-    var nStart = start;
-    var nEnd = end;
+    var edge = new Edge(start, end);
 
-    if (end.x > start.x || (end.x == start.x && end.y > start.y)) {
-      nStart = end;
-      nEnd = start;
-    }
+    if (this.edgeMap[start] == null) this.edgeMap[start] = new Map<Point,Edge>();
+    if (this.edgeMap[end] == null) this.edgeMap[end] = new Map<Point,Edge>();
 
-    var edge = new Edge(nStart, nEnd);
-
-    if (this.edges[nStart] == null) this.edges[nStart] = new Map<Point,Edge>();
-
-    this.edges[nStart][nEnd] = edge;
+    this.edges.push(edge);
+    this.edgeMap[start][end] = edge;
+    this.edgeMap[end][start] = edge;
 
     return edge;
   }
@@ -96,6 +85,32 @@ class Model {
     var edge = this.findEdge(start, end);
     if (edge == null) edge = this.addEdge(start, end);
     return edge;
+  }
+
+  public function addEdgeFeature(start: Point, end: Point, feature: EdgeFeature) {
+    var edge = this.findOrAddEdge(start, end);
+    if (edge.start != start) feature.offsets = {start: 0 - feature.offsets.end, end: 0 - feature.offsets.start};
+    edge.features.push(feature);
+  }
+
+  public function edgesForPoint(point: Point): Array<Edge> {
+    var edgeMap = this.edgeMap[point];
+    if (edgeMap == null) return [];
+
+    var edges = [for (p in edgeMap.keys()) edgeMap[p]];
+
+    edges.sort(function(edgeA,edgeB) {
+      var a = edgeA.start == point ? edgeA.end : edgeA.start;
+      var b = edgeB.start == point ? edgeB.end : edgeB.start;
+      if (a.x >= point.x && b.x < point.x) return 1;
+      if (a.x < point.x && b.x >= point.x) return -1;
+      if (a.x == b.x) return a.y - b.y > 0 ? 1 : -1;
+
+      var xProd = (a.x - point.x) * (b.y - point.y) - (b.x - point.x) * (a.y - point.y);
+      return xProd < 0 ? 1 : -1;
+    });
+
+    return edges;
   }
 
   public static function findCircumference( wards:Array<Patch> ):Polygon {

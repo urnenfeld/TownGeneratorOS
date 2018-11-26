@@ -28,5 +28,5 @@ class GeomUtils {
 		return x1 * y2 - y1 * x2;
 
 	public static function distance2line( x1:Float, y1:Float, dx1:Float, dy1:Float, x0:Float, y0:Float ):Float
-		return (dx1 * y0 - dy1 * x0 + (y1 + dy1) * x1 - (x1 + dx1) * y1) / Math.sqrt( dx1 * dx1 + dy1 * dy1 );
+		return Math.abs((dx1 * y0 - dy1 * x0 + (y1 + dy1) * x1 - (x1 + dx1) * y1) / Math.sqrt( dx1 * dx1 + dy1 * dy1 ));
 }

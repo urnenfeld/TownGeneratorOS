@@ -187,8 +187,8 @@ class Generator {
 
     tidyUpRoads();
 
-    // for (a in this.model.arteries)
-    //   smoothStreet( a );
+    for (a in this.model.arteries)
+      smoothStreet( a );
   }
 
   private function tidyUpRoads() {

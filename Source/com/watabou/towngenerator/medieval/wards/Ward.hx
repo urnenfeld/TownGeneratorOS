@@ -10,6 +10,8 @@ import com.watabou.towngenerator.medieval.Cutter;
 import com.watabou.towngenerator.medieval.Patch;
 import com.watabou.towngenerator.medieval.Model;
 
+import com.watabou.towngenerator.model.edgefeatures.RoadFeature;
+
 using com.watabou.utils.ArrayExtender;
 using com.watabou.utils.PointExtender;
 
@@ -38,33 +40,39 @@ class Ward {
   private function filterOutskirts() {
     var populatedEdges:Array<Dynamic> = [];
 
-    function addEdge( v1:Point, v2:Point, factor=1.0 ) {
-      var dx = v2.x - v1.x;
-      var dy = v2.y - v1.y;
-      var distances = new Map<Point,Float>();
-      var d = patch.shape.max( function( v:Point )
-        return distances[v] = (v != v1 && v != v2 ? GeomUtils.distance2line( v1.x, v1.y, dx, dy, v.x, v.y ) : 0) * factor);
+    function addEdge(p1: Point, p2: Point, factor = 1.0) {
+      var dx = p2.x - p1.x;
+      var dy = p2.y - p1.y;
 
-      populatedEdges.push( {x: v1.x, y: v1.y, dx: dx, dy: dy, d: distances[d]} );
+      // Find the point furthest away from this edge
+      var d = patch.shape.map(function(p): Float {
+        if (p == p1 || p == p2) return 0;
+        return GeomUtils.distance2line(p1.x, p1.y, dx, dy, p.x, p.y );
+      }).max();
+
+      populatedEdges.push({x: p1.x, y: p1.y, dx: dx, dy: dy, d: d * factor});
     }
 
-    patch.shape.forEdge( function( v1:Point, v2:Point ) {
+    for (edge in patch.edges) {
       var onRoad = false;
-      for (street in model.arteries)
-        if (street.contains( v1 ) && street.contains( v2 )) {
-          onRoad = true;
-          break;
-        }
 
-      if (onRoad)
-        addEdge( v1, v2, 1 );
-      else {
-        var n = model.getNeighbour( patch, v1 );
-        if (n != null)
-          if (n.withinCity)
-            addEdge( v1, v2, model.isEnclosed( n ) ? 1 : 0.4 );
+      for (feature in edge.features) {
+        switch (Type.getClass(feature)) {
+          case RoadFeature:
+            onRoad = cast(feature, RoadFeature).type == Road;
+            break;
+        }
       }
-    } );
+
+      if (onRoad) {
+        addEdge(edge.start, edge.end, 1);
+      } else {
+        var n = model.getNeighbour(patch, edge.start);
+        if (n != null && n.withinCity) {
+          addEdge(edge.start, edge.end, model.isEnclosed(n) ? 1 : 0.4);
+        }
+      }
+    }
 
     // For every vertex: if this belongs only
     // to patches within city, then 1, otherwise 0

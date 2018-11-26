@@ -52,8 +52,17 @@ class ArrayExtender {
     return ret;
   }
 
-  public static function min<T>( a:Array<T>, f:T->Float ):T {
+  public static function min<T>(a: Array<T>, f: T->Float = null): T {
     if (a.length == 0) return null;
+
+    if (f == null) {
+      var min: Dynamic = a[0];
+      for (i in 1...a.length) {
+        var element: Dynamic = a[i];
+        if (element < min) min = element;
+      }
+      return min;
+    }
 
     var result = a[0];
     var min = f( result );
@@ -68,14 +77,23 @@ class ArrayExtender {
     return result;
   }
 
-  public static function max<T>( a:Array<T>, f:T->Float ):T {
+  public static function max<T>(a: Array<T>, f: T->Float = null): T {
     if (a.length == 0) return null;
 
+    if (f == null) {
+      var max: Dynamic = a[0];
+      for (i in 1...a.length) {
+        var element: Dynamic = a[i];
+        if (element > max) max = element;
+      }
+      return max;
+    }
+
     var result = a[0];
-    var max = f( result );
+    var max = f(result);
     for (i in 1...a.length) {
       var element = a[i];
-      var measure = f( element );
+      var measure = f(element);
       if (measure > max) {
         result = element;
         max = measure;

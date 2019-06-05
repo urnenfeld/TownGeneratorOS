@@ -7,6 +7,7 @@ import com.watabou.coogee.Scene;
 import com.watabou.towngenerator.building.Model;
 import com.watabou.towngenerator.mapping.CityMap;
 import com.watabou.towngenerator.ui.CitySizeButton;
+import com.watabou.towngenerator.ui.CityStyleButton;
 import com.watabou.towngenerator.ui.Tooltip;
 
 class TownScene extends Scene {
@@ -16,8 +17,9 @@ class TownScene extends Scene {
 
 	public function new() {
 		super();
-
+		trace("Creating scene");
 		map = new CityMap( Model.instance );
+
 		addChild( map );
 
 		addChild( new Tooltip() );
@@ -29,9 +31,10 @@ class TownScene extends Scene {
 		var largeTown = new CitySizeButton( "Large Town", 10, 15 );
 		var smallCity = new CitySizeButton( "Small City", 15, 24 );
 		var largeCity = new CitySizeButton( "Large City", 24, 40 );
+		var style = new CityStyleButton( "Style", 50, 59 );
 
 		var pos = 0.0;
-		for (btn in [smallTown, largeTown, smallCity, largeCity]) {
+		for (btn in [smallTown, largeTown, smallCity, largeCity, style]) {
 			btn.y = pos;
 			pos += btn.height + 1;
 			buttons.addChild( btn );

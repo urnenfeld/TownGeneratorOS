@@ -20,14 +20,14 @@ class CityMap extends Sprite {
 
 	public static var palette = Palette.DEFAULT;
 
+	public static var instance	: CityMap;
+
 	private var patches	: Array<PatchView>;
 
 	private var brush	: Brush;
 
-	public function new( model:Model ) {
-		super();
 
-		brush = new Brush( palette );
+	public function reDraw():Void {
 
 		var model = Model.instance;
 
@@ -76,6 +76,17 @@ class CityMap extends Sprite {
 
 		if (model.citadel != null)
 			drawWall( walls.graphics, cast( model.citadel.ward, Castle).wall, true );
+
+	}
+
+	public function new( model:Model ) {
+		super();
+
+		instance = this;
+
+		brush = new Brush( palette );
+
+        reDraw( );
 	}
 
 	private function drawRoad( g:Graphics, road:Street ):Void {

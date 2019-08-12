@@ -15,7 +15,7 @@ class CityStyleButton extends Button {
 
     static private var palettes	: Array<Palette> = [];
     static private var rotatorIndex: Int = 0;
-    
+
 	public function new( label:String, minSize:Int, maxSize:Int ) {
 		super( label );
 
@@ -39,13 +39,11 @@ class CityStyleButton extends Button {
 
         if (rotatorIndex < (palettes.length - 1))
             rotatorIndex++;
-        else 
+        else
             rotatorIndex = 0;
 
         CityMap.palette = palettes[rotatorIndex];
-        
-        // "safe" place to invoke stage
-        stage.color = CityMap.palette.paper;
+
         CityMap.instance.reDraw();
 	}
 }

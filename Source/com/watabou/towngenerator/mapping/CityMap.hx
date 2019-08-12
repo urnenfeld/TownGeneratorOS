@@ -31,6 +31,9 @@ class CityMap extends Sprite {
 
 		var model = Model.instance;
 
+        if (stage != null)
+            stage.color = palette.paper;
+
 		for (road in model.roads) {
 			var roadView = new Shape();
 			drawRoad( roadView.graphics, road );

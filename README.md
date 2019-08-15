@@ -4,3 +4,12 @@ lacks some of the latest features, namely waterbodies, options UI and some small
 
 You'll need [OpenFL](https://github.com/openfl/openfl) and [msignal](https://github.com/massiveinteractive/msignal) 
 to run this code, both available through `haxelib`.
+
+# Building steps
+- Ensure to have HaXe [installed](https://haxe.org/download/linux/)
+- Install [openfl](https://www.openfl.org/download/)
+- Then you will test through openfl instead of HaXe:
+```
+$ cd $TownGeneratorOS
+$ openfl test linux
+```
